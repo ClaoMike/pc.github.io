@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Clao :* Patris</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <script type="module">
+    import * as THREE from "https://web.cs.manchester.ac.uk/three/three.js-master/build/three.module.js";
+    import { OrbitControls } from "https://web.cs.manchester.ac.uk/three/three.js-master/examples/jsm/controls/OrbitControls.js";
+
+    var camera, scene, renderer;
+    var MAXPOINTS = 5000000;
+    var drawCount = 0;
+    var t = 0;
+
+    var SphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+
+    var SphereMaterial = new THREE.MeshBasicMaterial({
+        color: 0xFFFFFF
+    });
+
+    var HeartSphere = new THREE.Mesh(SphereGeometry, SphereMaterial);
+
+    var HeartLineGeometry = new THREE.BufferGeometry();
+
+    var HeartPoints = new Float32Array(3 * MAXPOINTS);
+
+    HeartLineGeometry.setAttribute('position',  new THREE.BufferAttribute(HeartPoints, 3));
+
+    var HeartLineMaterial = new THREE.LineBasicMaterial({
+        color: 0xFF0000,
+        linewidth: 1
+    });
+
+    var HeartLine = new THREE.Line(HeartLineGeometry, HeartLineMaterial);
+
+    init();
+
+    scene.add(HeartSphere);
+
+    scene.add(HeartLine);
+
+    animate();
+
+    function init(){
+        scene = new THREE.Scene();
+
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 30);
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setClearColor(0x000000, 1.0);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+
+        document.body.appendChild(renderer.domElement);
+    }
+
+    function animate(){
+        requestAnimationFrame(animate);
+
+        drawHeart();
+
+        drawCount += 3;
+
+        renderer.render(scene, camera);
+    }
+
+    function drawHeart(){
+        t += 0.05;
+        var x = 16 * Math.pow(Math.sin(t), 3);
+        var y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos( 4 * t);
+
+        HeartSphere.position.x = x;
+        HeartSphere.position.y = y;
+
+        var points = HeartLine.geometry.attributes.position.array;
+        points[drawCount] = x;
+        points[drawCount + 1] = y;
+
+        HeartLine.geometry.setDrawRange(0, (drawCount + 3) / 3);
+        HeartLine.geometry.attributes.position.needsUpdate = true;
+    }
+
+    </script>
+
+</body>
+</html>
